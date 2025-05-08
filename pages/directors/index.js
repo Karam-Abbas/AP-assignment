@@ -3,7 +3,7 @@ import useSWR from 'swr'
 
 const fetcher = (url) => fetch(url).then(res => res.json())
 const index = () => {
-    const { data,error,isLoading} = useSWR('/api/director', fetcher);
+    const { data,error,isLoading} = useSWR('/api/directors', fetcher);
     if (error) return <div>Failed to load the data</div>
   if (isLoading) return <div>Loading...</div>
   return (

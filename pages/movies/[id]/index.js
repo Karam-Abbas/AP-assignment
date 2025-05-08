@@ -58,9 +58,7 @@ export default index;
 
 export async function getStaticProps(context) {
   const id = context.params.id;
-  console.log(id);
-  const movie = await axios.post("http://localhost:3000/api/movies", { id });
-  console.log(movie.data);
+  const movie = await axios.get(`http://localhost:3000/api/movies/${id}`);
   return {
     props: { movie: movie.data },
   };

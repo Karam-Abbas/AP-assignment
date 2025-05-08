@@ -20,7 +20,7 @@ const index = ({  genres }) => {
 export default index;
 
 export async function getServerSideProps() {
-  const genres = await axios.get("http://localhost:3000/api/genre");
+  const genres = await axios.get("http://localhost:3000/api/genres");
   return {
     props: { genres: genres.data },
   };

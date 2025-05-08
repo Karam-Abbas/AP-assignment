@@ -11,8 +11,7 @@ const index = () => {
  
     if (error) return <div>failed to load</div>
     if (isLoading) return <div>loading...</div>
-    const movies = data.filter((movie,index)=>movie.genreId===value);
-    console.log(movies);
+    const movies = data.filter((movie)=>movie.genreId===value);
   return (
     <div className='flex flex-col items-center justify-center gap-4 m-4'>
         <div className='text-4xl font-bold tracking-tighter'>Genre: {value}</div>

@@ -5,9 +5,7 @@ export default function handler(req, res) {
     const data = fs.readFileSync(p)
     const allMovies = JSON.parse(data);
   if (req.method === "GET") {
-    res.status(200).json(allMovies.movies);
-  } else if (req.method === "POST") {
-    const  id  = req.body.id
+    const  id  = req.query.id
     const movie = allMovies.movies.find((m)=>m.id===id);
     res.status(200).json(movie);
   }

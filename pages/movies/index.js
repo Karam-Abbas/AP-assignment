@@ -85,7 +85,7 @@ export default index;
 
 export async function getStaticProps() {
   const movies = await axios.get("http://localhost:3000/api/movies");
-  const genres = await axios.get("http://localhost:3000/api/genre");
+  const genres = await axios.get("http://localhost:3000/api/genres");
   if (!movies) {
     return {
       notFound: true,
