@@ -1,55 +1,109 @@
-import { useRouter } from 'next/router'
-import React from 'react'
-import useSWR from 'swr'
-import Link from 'next/link'
+import { useRouter } from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
+import Link from 'next/link';
+import { Layout, Typography, Card, Row, Col, Spin, Alert, Rate, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
-const fetcher = (url) => fetch(url).then(res => res.json())
-const index = () => {
-    const router = useRouter()
-    const value = router.query.id;
-    const { data, error, isLoading } = useSWR(`/api/movies`, fetcher)
- 
-    if (error) return <div>failed to load</div>
-    if (isLoading) return <div>loading...</div>
-    const movies = data.filter((movie)=>movie.genreId===value);
+const { Content } = Layout;
+const { Title, Paragraph } = Typography;
+
+const GenreDetailsPage = () => {
+  const router = useRouter();
+  const value = router.query.id;
+  const { data, error, isLoading } = useSWR(`/api/movies`, (url) => fetch(url).then(res => res.json()));
+
+  if (error) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load movies"
+        type="error"
+        showIcon
+        className="m-4"
+      />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Loading movies..." />
+      </div>
+    );
+  }
+
+  const movies = data.filter((movie) => movie.genreId === value);
+
   return (
-    <div className='flex flex-col items-center justify-center gap-4 m-4'>
-        <div className='text-4xl font-bold tracking-tighter'>Genre: {value}</div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-          {movies.map((movie, index) => (
-            <Link
-              key={movie.id || index}
-              className="border rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-              href={`/movies/${movie.id}`}
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                  {movie.title}
-                </h2>
-                {movie.description && (
-                  <p className="text-gray-600 text-sm mb-4">
-                    {movie.description.substring(0, 100)}...
-                  </p>
-                )}
-                {movie.releaseYear && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      Released: {movie.releaseYear}
-                    </span>
-                    {movie.rating && (
-                      <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
-                        ★ {movie.rating}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
+    <Layout className="min-h-screen">
+      <Content className="p-8">
+        <div className="container mx-auto">
+          <div className="mb-8">
+            <Link href="/genres">
+              <Button icon={<ArrowLeftOutlined />} size="large">
+                Back to Genres
+              </Button>
             </Link>
-          ))}
-        </div>
-        </div>
-  )
-}
+          </div>
 
-export default index
+          <Title level={1} className="text-center mb-8">
+            Genre: {value}
+          </Title>
+
+          <Row gutter={[24, 24]}>
+            {movies.map((movie, index) => (
+              <Col xs={24} sm={12} lg={8} key={movie.id || index}>
+                <Link href={`/movies/${movie.id}`}>
+                  <Card 
+                    hoverable
+                    className="h-full"
+                    cover={
+                      movie.posterUrl && (
+                        <img
+                          alt={movie.title}
+                          src={movie.posterUrl}
+                          className="h-64 object-cover"
+                        />
+                      )
+                    }
+                  >
+                    <Card.Meta
+                      title={movie.title}
+                      description={
+                        <>
+                          {movie.description && (
+                            <Paragraph ellipsis={{ rows: 2 }} className="text-gray-600">
+                              {movie.description}
+                            </Paragraph>
+                          )}
+                          <div className="flex justify-between items-center mt-4">
+                            {movie.releaseYear && (
+                              <span className="text-gray-500">
+                                Released: {movie.releaseYear}
+                              </span>
+                            )}
+                            {movie.rating && (
+                              <Rate 
+                                disabled 
+                                defaultValue={movie.rating / 2} 
+                                allowHalf 
+                                className="text-sm"
+                              />
+                            )}
+                          </div>
+                        </>
+                      }
+                    />
+                  </Card>
+                </Link>
+              </Col>
+            ))}
+          </Row>
+        </div>
+      </Content>
+    </Layout>
+  );
+};
+
+export default GenreDetailsPage;

@@ -1,37 +1,66 @@
 import React from "react";
 import axios from "axios";
-const index = (props) => {
-  const director = props.director;
+import { Layout, Typography, Card, Descriptions, Button } from 'antd';
+import { ArrowLeftOutlined, UserOutlined, IdcardOutlined, BookOutlined } from '@ant-design/icons';
+import Link from "next/link";
+
+const { Content } = Layout;
+const { Title, Paragraph } = Typography;
+
+const DirectorDetails = ({ director }) => {
   return (
-    <div className="bg-white max-w-3xl mx-auto my-8 rounded-lg border overflow-hidden shadow-md">
-      <h1 className="text-2xl font-bold p-4 text-gray-800 bg-blue-600 text-white shadow-md">
-        Director Details
-      </h1>
+    <Layout className="min-h-screen">
+      <Content className="p-8">
+        <div className="container mx-auto max-w-3xl">
+          <Link href={`/movies`}>
+            <Button 
+              icon={<ArrowLeftOutlined />} 
+              className="mb-4"
+              size="large"
+            >
+              Back to Movies
+            </Button>
+          </Link>
 
-      <div className="space-y-4 p-6">
-        <div className="border-b pb-4">
-          <label className="text-sm text-gray-600">ID</label>
-          <div className="text-lg font-medium">{director.id}</div>
-        </div>
+          <Card>
+            <Title level={2} className="flex items-center gap-2 mb-6">
+              <UserOutlined />
+              Director Details
+            </Title>
 
-        <div className="border-b pb-4">
-          <label className="text-sm text-gray-600">Name</label>
-          <div className="text-lg font-medium">{director.name}</div>
-        </div>
+            <Descriptions 
+              bordered 
+              column={1}
+              labelStyle={{ fontWeight: 'bold' }}
+            >
+              <Descriptions.Item 
+                label={<span><IdcardOutlined className="mr-2" />ID</span>}
+              >
+                {director.id}
+              </Descriptions.Item>
 
-        <div>
-          <label className="text-sm text-gray-600">Biography</label>
-          <div className="text-gray-700 leading-relaxed mt-2">
-            {director.biography}
-          </div>
+              <Descriptions.Item 
+                label={<span><UserOutlined className="mr-2" />Name</span>}
+              >
+                {director.name}
+              </Descriptions.Item>
+
+              <Descriptions.Item 
+                label={<span><BookOutlined className="mr-2" />Biography</span>}
+              >
+                <Paragraph>{director.biography}</Paragraph>
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
         </div>
-      </div>
-    </div>
+      </Content>
+    </Layout>
   );
 };
 
-export default index;
+export default DirectorDetails;
 
+// Keep the existing getServerSideProps
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const response = await axios.get(
@@ -39,7 +68,7 @@ export async function getServerSideProps(context) {
   );
   return {
     props: {
-      director:response.data
+      director: response.data
     },
   };
 }

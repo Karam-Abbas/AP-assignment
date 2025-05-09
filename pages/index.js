@@ -1,67 +1,106 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { Typography, Button, Card, Rate, Row, Col, Layout } from 'antd';
+import { FireOutlined, AppstoreOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+
+const { Title, Paragraph } = Typography;
+const { Content } = Layout;
+
 export default function Home({movies}) {
   const router = useRouter();
-  const func = () => {
-    router.push("/genres");
-  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
-          Trending Movies
-        </h1>
-        <div className="flex flex-row items-center justify-start">
-        <button
-          onClick={func}
-          className="rounded-lg bg-blue-500 hover:transition-transform hover:scale-105 py-2 px-4 text-white mb-4"
-        >
-          Browse Genres
-        </button>
-        <Link
-         href={'/movies'}
-          className="rounded-lg ml-2 bg-blue-500 hover:transition-transform hover:scale-105 py-2 px-4 text-white mb-4"
-        >
-          All Movies
-        </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {movies.map((movie, index) => (
-            <Link
-              key={movie.id || index}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-              href={`/movies/${movie.id}`}
+    <Layout className="min-h-screen">
+      <Content className="p-8">
+        <div className="container mx-auto">
+          <Title level={1} className="text-center mb-8">
+            <FireOutlined className="mr-2 text-orange-500" />
+            Trending Movies
+          </Title>
+
+          <div className="flex gap-4 mb-8">
+            <Button 
+              type="primary" 
+              size="large"
+              icon={<AppstoreOutlined />}
+              onClick={() => router.push("/genres")}
             >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                  {movie.title}
-                </h2>
-                {movie.description && (
-                  <p className="text-gray-600 text-sm mb-4">
-                    {movie.description.substring(0, 100)}...
-                  </p>
-                )}
-                {movie.releaseYear && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      Released: {movie.releaseYear}
-                    </span>
-                    {movie.rating && (
-                      <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
-                        ★ {movie.rating}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
+              Browse Genres
+            </Button>
+            <Button 
+              type="primary"
+              size="large"
+              icon={<UnorderedListOutlined />}
+              href="/movies"
+            >
+              All Movies
+            </Button>
+            <Button 
+              type="primary"
+              size="large"
+              icon={<UserOutlined />}
+              href="/directors"
+            >
+              Directors
+            </Button>
+          </div>
+
+          <Row gutter={[24, 24]}>
+            {movies.map((movie, index) => (
+              <Col xs={24} sm={12} lg={8} key={movie.id || index}>
+                <Link href={`/movies/${movie.id}`} style={{ display: 'block' }}>
+                  <Card 
+                    hoverable
+                    className="h-full"
+                    cover={
+                      movie.posterUrl && (
+                        <img
+                          alt={movie.title}
+                          src={movie.posterUrl}
+                          className="h-64 object-cover"
+                        />
+                      )
+                    }
+                  >
+                    <Card.Meta
+                      title={movie.title}
+                      description={
+                        <>
+                          {movie.description && (
+                            <Paragraph ellipsis={{ rows: 2 }} className="text-gray-600">
+                              {movie.description}
+                            </Paragraph>
+                          )}
+                          <div className="flex justify-between items-center mt-4">
+                            {movie.releaseYear && (
+                              <span className="text-gray-500">
+                                Released: {movie.releaseYear}
+                              </span>
+                            )}
+                            {movie.rating && (
+                              <Rate 
+                                disabled 
+                                defaultValue={movie.rating / 2} 
+                                allowHalf 
+                                className="text-sm"
+                              />
+                            )}
+                          </div>
+                        </>
+                      }
+                    />
+                  </Card>
+                </Link>
+              </Col>
+            ))}
+          </Row>
         </div>
-      </div>
-    </div>
+      </Content>
+    </Layout>
   );
 }
+
 
 export async function getStaticProps() {
   const movies = await axios.get("http://localhost:3000/api/trendy");

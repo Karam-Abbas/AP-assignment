@@ -1,42 +1,77 @@
-import React from 'react'
-import useSWR from 'swr'
+import React from "react";
+import useSWR from "swr";
+import { Card, Typography, Spin, Alert, Row, Col, Divider } from 'antd';
 
-const fetcher = (url) => fetch(url).then(res => res.json())
-const index = () => {
-    const { data,error,isLoading} = useSWR('/api/directors', fetcher);
-    if (error) return <div>Failed to load the data</div>
-  if (isLoading) return <div>Loading...</div>
-  return (
-    <div className='m-4'>
-      <div className='text-4xl font-bold tracking-tighter text-center'>All Directors</div>
-      <div className='flex flex-row flex-wrap justify-center gap-4 '>{data.map((director,index)=>(
-        <div className="bg-white w-1/5 mx-auto my-8 rounded-lg border overflow-hidden shadow-md">
-        <h1 className="text-2xl font-bold p-4 text-gray-800 bg-blue-600 text-white shadow-md">
-          Director Details
-        </h1>
-  
-        <div className="space-y-4 p-6">
-          <div className="border-b pb-4">
-            <label className="text-sm text-gray-600">ID</label>
-            <div className="text-lg font-medium">{director.id}</div>
-          </div>
-  
-          <div className="border-b pb-4">
-            <label className="text-sm text-gray-600">Name</label>
-            <div className="text-lg font-medium">{director.name}</div>
-          </div>
-  
-          <div>
-            <label className="text-sm text-gray-600">Biography</label>
-            <div className="text-gray-700 leading-relaxed mt-2">
-              {director.biography}
-            </div>
-          </div>
-        </div>
+const { Title, Text, Paragraph } = Typography;
+
+const DirectorsPage = () => {
+  const { data, error, isLoading } = useSWR("/api/directors", (url) => fetch(url).then((res) => res.json()));
+
+  if (error) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load the directors data"
+        type="error"
+        showIcon
+        className="m-4"
+      />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Loading directors..." />
       </div>
-      ))}</div>
-    </div>
-  )
-}
+    );
+  }
 
-export default index
+  return (
+    <div className="p-8">
+      <Title level={2} className="text-center mb-8">
+        All Directors
+      </Title>
+      
+      <Row gutter={[24, 24]} justify="center">
+        {data.map((director) => (
+          <Col xs={24} sm={12} lg={8} xxl={6} key={director.id}>
+            <Card 
+              hoverable
+              className="h-full"
+              title={
+                <Title level={4} className="mb-0">
+                  Director Details
+                </Title>
+              }
+            >
+              <div className="space-y-4">
+                <div>
+                  <Text type="secondary">ID</Text>
+                  <Paragraph strong>{director.id}</Paragraph>
+                  <Divider style={{ margin: '12px 0' }} />
+                </div>
+
+                <div>
+                  <Text type="secondary">Name</Text>
+                  <Paragraph strong>{director.name}</Paragraph>
+                  <Divider style={{ margin: '12px 0' }} />
+                </div>
+
+                <div>
+                  <Text type="secondary">Biography</Text>
+                  <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: 'more' }}>
+                    {director.biography}
+                  </Paragraph>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
+};
+
+export default DirectorsPage;
+
